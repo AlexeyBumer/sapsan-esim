@@ -1,19 +1,18 @@
 import type { Metadata, Viewport } from "next";
-import localFont from "next/font/local";
-import { JetBrains_Mono } from "next/font/google";
+import { Prociono, JetBrains_Mono } from "next/font/google";
 import "../styles/globals.css";
 import SmoothScroll from "@/lib/SmoothScroll";
 
 /**
- * Prociono — для крупных дисплейных заголовков.
- * Положите Prociono-Regular.woff2 в /public/fonts.
- * (Шрифт доступен в Google Fonts / The League of Moveable Type.)
+ * Prociono — крупные дисплейные заголовки. Грузится из Google Fonts.
+ * JetBrains Mono — интерфейс, цифры, тарифы.
+ * Шрифты подключаются автоматически — никаких файлов скачивать не нужно.
  */
-const prociono = localFont({
-  src: "../../public/fonts/Prociono-Regular.woff2",
+const prociono = Prociono({
+  weight: "400",
+  subsets: ["latin"],
   variable: "--font-prociono",
   display: "swap",
-  fallback: ["Georgia", "serif"],
 });
 
 const jetbrains = JetBrains_Mono({
@@ -25,7 +24,7 @@ const jetbrains = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "Sapsan eSIM — Приземляйся на связи",
   description:
-    "Глобальная eSIM с оплатой по мере использования. Без роуминга, без пакетов, без тарифов. Создано для лётного состава — теперь доступно каждому.",
+    "Глобальная eSIM с оплатой по мере использования. Без роуминга, без пакетов. Создано для лётного состава — теперь доступно каждому.",
   openGraph: {
     title: "Sapsan eSIM — Приземляйся на связи",
     description: "Глобальная eSIM с оплатой по мере использования.",
