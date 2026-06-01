@@ -23,13 +23,13 @@ function PhoneMockup() {
     setTyped("");
     setShowEid(false);
     const typer = setInterval(() => {
-      if (i < DIAL.length) {
-        setTyped((prev) => prev + DIAL[i]);
-        i++;
-      } else {
+      if (i >= DIAL.length) {
         clearInterval(typer);
         setTimeout(() => setShowEid(true), 500);
+        return;
       }
+      i++;
+      setTyped(DIAL.slice(0, i).join(""));
     }, 420);
     return () => clearInterval(typer);
   }, [inView]);
@@ -55,10 +55,10 @@ function PhoneMockup() {
           </div>
 
           {/* экран набора */}
-          <div className="flex h-full flex-col px-5 pb-6 pt-12">
+          <div className="flex h-full flex-col px-3.5 pb-6 pt-12">
             {/* поле ввода номера */}
             <div className="text-center">
-              <p className="min-h-[2.5rem] font-mono text-3xl tracking-widest text-ink">
+              <p className="min-h-[2.5rem] whitespace-nowrap font-mono text-2xl tracking-tight text-ink">
                 {typed}
                 <motion.span
                   animate={{ opacity: [1, 0] }}

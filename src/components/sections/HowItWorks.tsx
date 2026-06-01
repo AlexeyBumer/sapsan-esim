@@ -25,7 +25,7 @@ export default function HowItWorks() {
               style={{ transformStyle: "preserve-3d", perspective: 1000 }}
               className="group relative h-full overflow-hidden rounded-3xl glass p-8"
             >
-              <div className="pointer-events-none absolute -right-8 -top-8 font-display text-[7rem] leading-none text-white/[0.04] transition-colors group-hover:text-peach/10">
+              <div className="pointer-events-none absolute right-3 top-1 font-display text-[6rem] leading-none text-white/[0.04] transition-colors group-hover:text-peach/10">
                 {s.n}
               </div>
               <div className="relative z-10">
