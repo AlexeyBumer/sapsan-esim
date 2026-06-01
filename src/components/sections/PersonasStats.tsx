@@ -47,7 +47,7 @@ export function Stats() {
         <div className="grid gap-px overflow-hidden rounded-3xl glass sm:grid-cols-2 lg:grid-cols-4">
           {STATS.map((s) => (
             <div key={s.label} className="bg-abyss/20 p-8 text-center">
-              <p className="font-display text-5xl text-grad">
+              <p className="font-mono text-4xl font-semibold text-grad sm:text-5xl">
                 <AnimatedCounter
                   to={s.value}
                   prefix={"prefix" in s ? (s.prefix as string) : ""}

@@ -40,7 +40,7 @@ export default function Referral() {
                 <span className="absolute inset-4 rounded-full border border-peach/10" />
                 <span className="absolute inset-10 rounded-full border border-peach/5" />
                 <div className="text-center">
-                  <p className="font-display text-6xl text-grad leading-none">+{REFERRAL.reward}</p>
+                  <p className="font-mono text-5xl font-bold text-grad leading-none">+{REFERRAL.reward}</p>
                   <p className="mt-2 font-mono text-[11px] uppercase tracking-widest text-mist/60">
                     за друга
                   </p>

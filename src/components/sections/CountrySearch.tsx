@@ -44,7 +44,7 @@ export default function CountrySearch() {
               ⬡
             </span>
             <div>
-              <p className="font-display text-lg text-ink">
+              <p className="font-mono text-lg font-semibold text-ink">
                 Открытие eSIM — <span className="text-peach">${ESIM_SETUP_PRICE}</span>
               </p>
               <p className="font-mono text-xs text-mist/60">
@@ -171,7 +171,7 @@ function Metric({ label, value, accent }: { label: string; value: string; accent
   return (
     <div className="rounded-2xl bg-abyss/40 p-4">
       <p className="font-mono text-xs uppercase tracking-widest text-mist/50">{label}</p>
-      <p className={`mt-1 font-display text-3xl ${accent ? "text-peach" : "text-ink"}`}>{value}</p>
+      <p className={`mt-1 font-mono text-2xl font-semibold sm:text-3xl ${accent ? "text-peach" : "text-ink"}`}>{value}</p>
     </div>
   );
 }

@@ -2,6 +2,7 @@ import Navbar from "@/components/sections/Navbar";
 import Hero from "@/components/sections/Hero";
 import Features from "@/components/sections/Features";
 import CountrySearch from "@/components/sections/CountrySearch";
+import EsimCheck from "@/components/sections/EsimCheck";
 import HowItWorks from "@/components/sections/HowItWorks";
 import WorldMap from "@/components/sections/WorldMap";
 import Referral from "@/components/sections/Referral";
@@ -15,6 +16,7 @@ export default function Home() {
       <Hero />
       <Features />
       <CountrySearch />
+      <EsimCheck />
       <HowItWorks />
       <WorldMap />
       <Referral />
