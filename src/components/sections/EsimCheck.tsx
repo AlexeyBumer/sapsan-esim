@@ -55,7 +55,7 @@ function PhoneMockup() {
           </div>
 
           {/* экран набора */}
-          <div className="flex h-full flex-col px-3.5 pb-6 pt-12">
+          <div className="flex h-full flex-col px-3.5 pb-10 pt-12">
             {/* поле ввода номера */}
             <div className="text-center">
               <p className="min-h-[2.5rem] whitespace-nowrap font-mono text-2xl tracking-tight text-ink">
@@ -95,13 +95,13 @@ function PhoneMockup() {
             )}
 
             {/* клавиатура набора */}
-            <div className="mt-auto grid grid-cols-3 gap-2.5 pt-4">
+            <div className="mt-auto grid grid-cols-3 gap-2 pt-4">
               {["1", "2", "3", "4", "5", "6", "7", "8", "9", "*", "0", "#"].map((k) => {
                 const active = typed.includes(k) && (k === "*" || k === "0" || k === "6" || k === "#");
                 return (
                   <div
                     key={k}
-                    className={`grid h-9 place-items-center rounded-full font-mono text-base transition-colors duration-300 ${
+                    className={`grid h-8 place-items-center rounded-full font-mono text-sm transition-colors duration-300 ${
                       active ? "bg-peach/20 text-peach" : "bg-white/5 text-mist/70"
                     }`}
                   >
