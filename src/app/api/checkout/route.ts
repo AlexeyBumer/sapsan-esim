@@ -60,7 +60,7 @@ export async function POST(req: Request) {
     const invoice = await createInvoice({
       amount,
       orderId,
-      urlSuccess: `${origin}/success?id=${encodeURIComponent(orderId)}&mode=${mode}&gb=${gb}`,
+      urlSuccess: `${origin}/success?id=${encodeURIComponent(orderId)}&mode=${mode}&gb=${gb}&amount=${amount}`,
       urlReturn: `${origin}/order`,
       urlCallback: `${origin}/api/heleket-webhook`,
       payerEmail: email,

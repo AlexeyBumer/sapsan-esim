@@ -22,9 +22,13 @@ export async function POST(req: Request) {
     const data = JSON.parse(raw);
     // Статусы: paid, paid_over — успешная оплата
     if (data.status === "paid" || data.status === "paid_over") {
-      // Заказ оплачен. order_id — это ID eSIM, additional_data — детали заказа.
-      console.log("[Heleket] Оплачен заказ:", data.order_id, data.additional_data);
-      // TODO (опционально): отправить оператору уведомление через Telegram Bot API
+      // Заказ оплачен. order_id — ID eSIM, additional_data — детали заказа.
+      // Здесь же доступны точные данные от Heleket:
+      //   data.payment_amount_usd — фактически оплаченная сумма в USD
+      //   data.updated_at — точное время подтверждения транзакции (UTC+3)
+      // Их можно сохранять в БД и показывать клиенту/оператору при автоматизации.
+      console.log("[Heleket] Оплачен заказ:", data.order_id, data.payment_amount_usd, data.updated_at);
+      // TODO (опционально): уведомить оператора через Telegram Bot API
     }
   } catch {
     // тело не распарсилось — игнорируем

@@ -3,6 +3,7 @@ import Navbar from "@/components/sections/Navbar";
 import { Footer } from "@/components/sections/FaqContactFooter";
 import { CONTACTS } from "@/lib/content";
 import CopyId from "./CopyId";
+import PaymentMeta from "./PaymentMeta";
 
 export const metadata: Metadata = {
   title: "Оплата получена",
@@ -12,12 +13,13 @@ export const metadata: Metadata = {
 export default async function SuccessPage({
   searchParams,
 }: {
-  searchParams: Promise<{ id?: string; mode?: string; gb?: string }>;
+  searchParams: Promise<{ id?: string; mode?: string; gb?: string; amount?: string }>;
 }) {
   const params = await searchParams;
   const id = params.id || "—";
   const mode = params.mode === "topup" ? "topup" : "new";
   const gb = params.gb || "";
+  const amount = params.amount || "";
 
   const tgText = encodeURIComponent(
     mode === "new"
@@ -48,6 +50,23 @@ export default async function SuccessPage({
         <div className="mt-8 w-full max-w-md rounded-2xl glass-strong p-6">
           <p className="font-mono text-xs uppercase tracking-widest text-mist/50">Ваш ID eSIM</p>
           <CopyId id={id} />
+
+          {/* Детали платежа */}
+          <div className="mt-5 space-y-2 border-t border-white/10 pt-5 font-mono text-sm">
+            {amount && (
+              <div className="flex justify-between">
+                <span className="text-mist/50">Сумма платежа</span>
+                <span className="text-peach">${amount}</span>
+              </div>
+            )}
+            {gb && (
+              <div className="flex justify-between">
+                <span className="text-mist/50">Объём</span>
+                <span className="text-ink">{gb} ГБ</span>
+              </div>
+            )}
+            <PaymentMeta />
+          </div>
         </div>
 
         {/* Инструкция */}
