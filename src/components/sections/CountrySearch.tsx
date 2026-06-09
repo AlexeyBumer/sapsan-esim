@@ -8,7 +8,6 @@ import {
   ESIM_SETUP_PRICE,
   PRICE_PER_GB,
   RF_NOTE,
-  CONTACTS,
 } from "@/lib/content";
 
 export default function CountrySearch() {
@@ -108,9 +107,7 @@ export default function CountrySearch() {
               </p>
             </div>
             <a
-              href={CONTACTS.telegram}
-              target="_blank"
-              rel="noopener noreferrer"
+              href={`/order?gb=${pkg.gb}`}
               className="flex w-full items-center justify-center rounded-full bg-peach-grad px-8 py-3.5 font-mono text-sm font-semibold text-abyss shadow-glow-sm transition-transform hover:scale-[1.02] sm:w-auto"
             >
               Купить {pkg.gb} ГБ
