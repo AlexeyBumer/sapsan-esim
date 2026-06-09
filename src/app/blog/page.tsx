@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 };
 
 export default function BlogIndex() {
-  const categories = ["Без блокировок", "Страны"] as const;
+  const categories = ["Без блокировок", "Страны", "Гайды"] as const;
 
   return (
     <main className="relative">
