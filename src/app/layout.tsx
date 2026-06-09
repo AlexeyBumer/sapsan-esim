@@ -23,7 +23,7 @@ const jetbrains = JetBrains_Mono({
 
 export const metadata: Metadata = {
   // Домен сайта
-  metadataBase: new URL("https://sapsansim.com"),
+  metadataBase: new URL("https://www.sapsansim.com"),
   title: {
     default: "Sapsan eSIM — Приземляйся на связи",
     template: "%s · Sapsan eSIM",

@@ -14,11 +14,11 @@ export const BRAND = {
 } as const;
 
 export const NAV_LINKS = [
-  { label: "Возможности", href: "#features" },
-  { label: "Тарифы", href: "#search" },
-  { label: "Как это работает", href: "#how" },
-  { label: "Рефералы", href: "#referral" },
-  { label: "Вопросы", href: "#faq" },
+  { label: "Возможности", href: "/#features" },
+  { label: "Тарифы", href: "/#search" },
+  { label: "Блог", href: "/blog" },
+  { label: "Рефералы", href: "/#referral" },
+  { label: "Вопросы", href: "/#faq" },
 ] as const;
 
 export const FEATURES = [

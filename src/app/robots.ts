@@ -5,7 +5,7 @@ import type { MetadataRoute } from "next";
  * и указывает путь к карте сайта.
 
  */
-const SITE_URL = "https://sapsansim.com";
+const SITE_URL = "https://www.sapsansim.com";
 
 export default function robots(): MetadataRoute.Robots {
   return {
