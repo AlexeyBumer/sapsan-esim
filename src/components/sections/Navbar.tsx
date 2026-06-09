@@ -41,8 +41,13 @@ export default function Navbar() {
           ))}
         </div>
         <div className="flex items-center gap-3">
-          <span className="hidden font-mono text-xs text-mist/60 sm:block">RU</span>
-          <MagneticButton href="#search" className="!px-5 !py-2.5 text-xs">
+          <a
+            href="/account"
+            className="hidden font-mono text-xs text-mist/70 transition-colors hover:text-peach sm:block"
+          >
+            Кабинет
+          </a>
+          <MagneticButton href="/#search" className="!px-5 !py-2.5 text-xs">
             {BRAND.cta}
           </MagneticButton>
         </div>
