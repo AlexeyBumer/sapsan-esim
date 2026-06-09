@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Prociono, JetBrains_Mono } from "next/font/google";
 import "../styles/globals.css";
 import SmoothScroll from "@/lib/SmoothScroll";
+import Analytics from "@/components/Analytics";
 
 /**
  * Prociono — крупные дисплейные заголовки. Грузится из Google Fonts.
@@ -92,6 +93,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ru" className={`${prociono.variable} ${jetbrains.variable}`}>
       <body className="noise font-mono antialiased">
+        <Analytics />
         <SmoothScroll>{children}</SmoothScroll>
       </body>
     </html>
