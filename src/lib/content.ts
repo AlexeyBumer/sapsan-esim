@@ -8,14 +8,14 @@ export const BRAND = {
   tagline: "Приземляйся на связи.",
   subtagline: "Создано для лётного состава. Теперь доступно каждому.",
   description:
-    "Глобальная eSIM с оплатой по мере использования. Без роуминга. Без пакетов.",
+    "Глобальная eSIM с оплатой по мере использования. Без роуминга и скрытых наценок.",
   cta: "Купить eSIM",
   ctaSecondary: "Проверить тариф",
 } as const;
 
 export const NAV_LINKS = [
   { label: "Возможности", href: "#features" },
-  { label: "Цены по странам", href: "#search" },
+  { label: "Тарифы", href: "#search" },
   { label: "Как это работает", href: "#how" },
   { label: "Рефералы", href: "#referral" },
   { label: "Вопросы", href: "#faq" },
@@ -29,7 +29,7 @@ export const FEATURES = [
   },
   {
     title: "Платите только за трафик",
-    text: "Оплата по факту использования. Никаких пакетов, которые сгорают.",
+    text: "Гибкие пакеты трафика. Остаток не сгорает между поездками.",
     icon: "wallet",
   },
   {
@@ -54,30 +54,28 @@ export const FEATURES = [
   },
 ] as const;
 
-export type CountryRate = {
-  country: string;
-  countryGenitive: string; // для «Купить eSIM для ...»
-  flag: string;
-  pricePerGb: number; // USD
-  operators: { name: string; price: number }[];
-  speed: string;
-  coverage: number; // %
-  note?: string; // спец. примечание над кнопкой
+export type DataPackage = {
+  gb: number;
+  price: number; // USD
+  popular?: boolean;
 };
 
-export const COUNTRY_RATES: CountryRate[] = [
-  { country: "Российская Федерация", countryGenitive: "РФ", flag: "🇷🇺", pricePerGb: 1.89, operators: [{ name: "Tele2", price: 1.89 }, { name: "Beeline", price: 1.99 }, { name: "MTS", price: 15.0 }], speed: "5G", coverage: 98, note: "С данной eSIM работают все заблокированные источники, включая Instagram, Telegram и пр. без дополнительного подключения к VPN." },
-  { country: "США", countryGenitive: "США", flag: "🇺🇸", pricePerGb: 3.5, operators: [{ name: "AT&T", price: 3.5 }, { name: "T-Mobile", price: 3.7 }, { name: "Verizon", price: 4.0 }], speed: "5G", coverage: 99 },
-  { country: "Германия", countryGenitive: "Германии", flag: "🇩🇪", pricePerGb: 2.9, operators: [{ name: "Telekom", price: 2.9 }, { name: "Vodafone", price: 3.1 }, { name: "O2", price: 2.7 }], speed: "5G", coverage: 98 },
-  { country: "Япония", countryGenitive: "Японии", flag: "🇯🇵", pricePerGb: 4.2, operators: [{ name: "NTT Docomo", price: 4.2 }, { name: "SoftBank", price: 4.5 }], speed: "5G", coverage: 99 },
-  { country: "ОАЭ", countryGenitive: "ОАЭ", flag: "🇦🇪", pricePerGb: 5.0, operators: [{ name: "Etisalat", price: 5.0 }, { name: "du", price: 5.3 }], speed: "5G", coverage: 99 },
-  { country: "Франция", countryGenitive: "Франции", flag: "🇫🇷", pricePerGb: 2.7, operators: [{ name: "Orange", price: 2.7 }, { name: "SFR", price: 2.9 }, { name: "Bouygues", price: 2.8 }], speed: "5G", coverage: 97 },
-  { country: "Турция", countryGenitive: "Турции", flag: "🇹🇷", pricePerGb: 2.4, operators: [{ name: "Turkcell", price: 2.4 }, { name: "Vodafone", price: 2.6 }], speed: "4G+", coverage: 96 },
-  { country: "Таиланд", countryGenitive: "Таиланда", flag: "🇹🇭", pricePerGb: 2.1, operators: [{ name: "AIS", price: 2.1 }, { name: "TrueMove", price: 2.3 }], speed: "5G", coverage: 95 },
-  { country: "Испания", countryGenitive: "Испании", flag: "🇪🇸", pricePerGb: 2.8, operators: [{ name: "Movistar", price: 2.8 }, { name: "Orange", price: 3.0 }], speed: "5G", coverage: 97 },
-  { country: "Великобритания", countryGenitive: "Великобритании", flag: "🇬🇧", pricePerGb: 3.1, operators: [{ name: "EE", price: 3.1 }, { name: "Vodafone", price: 3.3 }, { name: "O2", price: 3.2 }], speed: "5G", coverage: 98 },
-  { country: "Сингапур", countryGenitive: "Сингапура", flag: "🇸🇬", pricePerGb: 3.8, operators: [{ name: "Singtel", price: 3.8 }, { name: "StarHub", price: 4.0 }], speed: "5G", coverage: 99 },
+// Тарифы трафика. Цена $1.99 за ГБ.
+export const DATA_PACKAGES: DataPackage[] = [
+  { gb: 5, price: 9.95 },
+  { gb: 10, price: 19.9 },
+  { gb: 15, price: 29.85, popular: true },
+  { gb: 20, price: 39.8 },
+  { gb: 30, price: 59.7 },
+  { gb: 40, price: 79.6 },
+  { gb: 50, price: 99.5 },
 ];
+
+export const PRICE_PER_GB = 1.99;
+
+// Примечание про РФ и работу заблокированных источников без VPN
+export const RF_NOTE =
+  "С eSIM Sapsan работают все заблокированные источники, включая Instagram, Telegram и пр. — без дополнительного подключения к VPN.";
 
 export const STEPS = [
   { n: "01", title: "Проверьте совместимость устройства", text: "Убедитесь, что ваш смартфон поддерживает eSIM. Это занимает 10 секунд." },
