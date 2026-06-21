@@ -90,10 +90,7 @@ export default async function AccountPage() {
               Здесь появятся ваши оплаченные eSIM с их ID. Пока вы можете оформить новую.
             </p>
           )}
-          
-            href="/order"
-            className="mt-5 inline-flex items-center justify-center rounded-full bg-peach-grad px-7 py-3 font-mono text-sm font-semibold text-abyss shadow-glow-sm transition-transform hover:scale-[1.02]"
-          >
+          <a href="/order" className="mt-5 inline-flex items-center justify-center rounded-full bg-peach-grad px-7 py-3 font-mono text-sm font-semibold text-abyss shadow-glow-sm transition-transform hover:scale-[1.02]">
             Купить eSIM →
           </a>
         </div>
