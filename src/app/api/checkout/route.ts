@@ -1,14 +1,11 @@
 import { NextResponse } from "next/server";
 import { createInvoice } from "@/lib/heleket";
 import { PRICE_PER_GB, ESIM_SETUP_PRICE } from "@/lib/content";
+import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 export const runtime = "nodejs";
 
-/**
- * POST /api/checkout
- * Принимает заказ из формы, создаёт счёт в Heleket, возвращает ссылку на оплату.
- * Тело: { mode: "new" | "topup", email?, esimId?, gb: number }
- */
 export async function POST(req: Request) {
   try {
     const body = await req.json();
@@ -17,7 +14,6 @@ export async function POST(req: Request) {
     const email: string | undefined = body.email?.trim() || undefined;
     const esimId: string | undefined = body.esimId?.trim() || undefined;
 
-    // Валидация
     if (!gb || gb < 1 || gb > 500) {
       return NextResponse.json(
         { error: "Укажите количество ГБ (от 1 до 500)." },
@@ -37,16 +33,13 @@ export async function POST(req: Request) {
       );
     }
 
-    // Расчёт суммы
     const trafficCost = gb * PRICE_PER_GB;
     const setup = mode === "new" ? ESIM_SETUP_PRICE : 0;
     const amount = (trafficCost + setup).toFixed(2);
 
-    // Уникальный ID заказа. Для новой eSIM он же станет ID, который сообщат оператору.
     const prefix = mode === "new" ? "SAP" : "TOP";
     const orderId = `${prefix}-${Date.now()}-${Math.floor(Math.random() * 9000 + 1000)}`;
 
-    // Базовый URL сайта
     const origin =
       process.env.NEXT_PUBLIC_SITE_URL || new URL(req.url).origin;
 
@@ -56,6 +49,26 @@ export async function POST(req: Request) {
       email: email || null,
       esimId: esimId || null,
     }).slice(0, 255);
+
+    const supabase = await createClient();
+    const { data: userData } = await supabase.auth.getUser();
+    const user = userData?.user ?? null;
+
+    if (user) {
+      const admin = createAdminClient();
+      const { error: insertError } = await admin.from("orders").insert({
+        user_id: user.id,
+        heleket_order_id: orderId,
+        mode,
+        package_gb: gb,
+        amount_usd: Number(amount),
+        payer_email: email ?? user.email ?? null,
+        payment_status: "pending",
+      });
+      if (insertError) {
+        console.error("Заказ не сохранён в БД (продолжаем без привязки):", insertError);
+      }
+    }
 
     const invoice = await createInvoice({
       amount,

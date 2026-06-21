@@ -10,6 +10,12 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
+const STATUS_LABELS: Record<string, string> = {
+  pending: "Ожидает оплаты",
+  paid: "Оплачен — ожидает активации",
+  failed: "Не оплачен",
+};
+
 export default async function AccountPage() {
   const supabase = await createClient();
   const {
@@ -18,12 +24,16 @@ export default async function AccountPage() {
 
   if (!user) redirect("/login");
 
-  // профиль (реф-код, баланс)
   const { data: profile } = await supabase
     .from("profiles")
     .select("referral_code, balance_usd, email")
     .eq("id", user.id)
     .single();
+
+  const { data: orders } = await supabase
+    .from("orders")
+    .select("id, mode, package_gb, amount_usd, payment_status, esim_id, created_at")
+    .order("created_at", { ascending: false });
 
   return (
     <main className="relative">
@@ -44,7 +54,6 @@ export default async function AccountPage() {
           </form>
         </div>
 
-        {/* Баланс */}
         <div className="mt-10 rounded-3xl glass-strong p-7">
           <p className="font-mono text-xs uppercase tracking-widest text-mist/50">Баланс</p>
           <p className="mt-2 font-mono text-4xl font-semibold text-grad">
@@ -55,13 +64,33 @@ export default async function AccountPage() {
           </p>
         </div>
 
-        {/* Мои eSIM (заглушка для следующего этапа) */}
         <div className="mt-5 rounded-3xl glass p-7">
-          <p className="font-mono text-xs uppercase tracking-widest text-mist/50">Мои eSIM</p>
-          <p className="mt-3 font-mono text-sm text-mist/70">
-            Здесь появятся ваши оплаченные eSIM с их ID. Пока вы можете оформить новую.
-          </p>
-          <a
+          <p className="font-mono text-xs uppercase tracking-widest text-mist/50">Мои заказы</p>
+          {orders && orders.length > 0 ? (
+            <div className="mt-4 space-y-3">
+              {orders.map((order) => (
+                <div key={order.id} className="rounded-2xl bg-white/5 p-4">
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono text-sm text-ink">
+                      {order.mode === "topup" ? "Пополнение" : "Новая eSIM"} — {order.package_gb} ГБ
+                    </span>
+                    <span className="font-mono text-xs text-peach">
+                      ${Number(order.amount_usd).toFixed(2)}
+                    </span>
+                  </div>
+                  <div className="mt-1 font-mono text-xs text-mist/50">
+                    {STATUS_LABELS[order.payment_status] ?? order.payment_status}
+                    {order.esim_id ? ` · eSIM ID: ${order.esim_id}` : ""}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="mt-3 font-mono text-sm text-mist/70">
+              Здесь появятся ваши оплаченные eSIM с их ID. Пока вы можете оформить новую.
+            </p>
+          )}
+          
             href="/order"
             className="mt-5 inline-flex items-center justify-center rounded-full bg-peach-grad px-7 py-3 font-mono text-sm font-semibold text-abyss shadow-glow-sm transition-transform hover:scale-[1.02]"
           >
@@ -69,7 +98,6 @@ export default async function AccountPage() {
           </a>
         </div>
 
-        {/* Реферальный код */}
         <div className="mt-5 rounded-3xl glass p-7">
           <p className="font-mono text-xs uppercase tracking-widest text-mist/50">
             Ваш реферальный код
