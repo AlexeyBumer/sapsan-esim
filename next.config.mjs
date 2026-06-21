@@ -5,6 +5,6 @@ const nextConfig = {
   // Сборка не падает из-за мелких предупреждений линтера/типов —
   // безопасно для деплоя лендинга.
   eslint: { ignoreDuringBuilds: true },
-  typescript: { ignoreBuildErrors: true },
+  typescript: { ignoreBuildErrors: false },
 };
 export default nextConfig;
