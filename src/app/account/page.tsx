@@ -4,6 +4,11 @@ import Navbar from "@/components/sections/Navbar";
 import { Footer } from "@/components/sections/FaqContactFooter";
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/app/auth/actions";
+import CopyReferralLink from "@/app/account/CopyReferralLink";
+
+function originUrl() {
+  return process.env.NEXT_PUBLIC_SITE_URL || "https://www.sapsansim.com";
+}
 
 export const metadata: Metadata = {
   title: "Личный кабинет",
@@ -100,6 +105,21 @@ export default async function AccountPage() {
             Ваш реферальный код
           </p>
           <p className="mt-2 font-mono text-2xl text-peach">{profile?.referral_code ?? "—"}</p>
+
+          {profile?.referral_code && (
+            <>
+              <p className="mt-5 font-mono text-xs uppercase tracking-widest text-mist/50">
+                Ссылка для друзей
+              </p>
+              <p className="mt-1 font-mono text-[11px] leading-relaxed text-mist/50">
+                Друг перейдёт по ссылке, и его пригласительный код подставится сам при регистрации.
+              </p>
+              <CopyReferralLink
+                link={`${originUrl()}/register?ref=${profile.referral_code}`}
+              />
+            </>
+          )}
+
           <p className="mt-3 font-mono text-xs leading-relaxed text-mist/60">
             Реферальная программа подключается на следующем этапе: за друзей, которые оформят eSIM,
             будет начисляться вознаграждение на баланс.

@@ -6,17 +6,18 @@ import { DATA_PACKAGES, PRICE_PER_GB, ESIM_SETUP_PRICE, CONTACTS } from "@/lib/c
 
 type Mode = "new" | "topup";
 
-export default function OrderForm() {
+export default function OrderForm({ isGuest = false }: { isGuest?: boolean }) {
   const [mode, setMode] = useState<Mode>("new");
   const [email, setEmail] = useState("");
   const [esimId, setEsimId] = useState("");
   const [selectedGb, setSelectedGb] = useState<number>(15);
   const [customMode, setCustomMode] = useState(false);
   const [customGb, setCustomGb] = useState("");
+  const [referralCode, setReferralCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Предвыбор пакета из ?gb= в адресе
+  // Предвыбор пакета из ?gb= и реферального кода из ?ref= в адресе
   useEffect(() => {
     const sp = new URLSearchParams(window.location.search);
     const g = Number(sp.get("gb"));
@@ -26,6 +27,8 @@ export default function OrderForm() {
       setCustomMode(true);
       setCustomGb(String(g));
     }
+    const ref = sp.get("ref");
+    if (ref) setReferralCode(ref.toUpperCase());
   }, []);
 
   const gb = customMode ? Number(customGb) || 0 : selectedGb;
@@ -57,7 +60,7 @@ export default function OrderForm() {
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mode, email, esimId, gb }),
+        body: JSON.stringify({ mode, email, esimId, gb, referralCode }),
       });
       const data = await res.json();
       if (!res.ok || !data.url) {
@@ -180,6 +183,21 @@ export default function OrderForm() {
             </motion.div>
           )}
         </div>
+
+        {/* Пригласительный код — только для гостей без аккаунта */}
+        {isGuest && (
+          <label className="mt-6 block">
+            <span className="font-mono text-xs uppercase tracking-widest text-mist/50">
+              Пригласительный код <span className="text-mist/30">(необязательно)</span>
+            </span>
+            <input
+              value={referralCode}
+              onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
+              placeholder="Например, A1B2C3D4"
+              className="mt-2 w-full rounded-xl border border-white/10 bg-abyss/40 px-4 py-3 font-mono text-sm uppercase text-ink outline-none transition-colors focus:border-peach/40 placeholder:text-mist/30"
+            />
+          </label>
+        )}
 
         {/* Итог */}
         <div className="mt-6 space-y-1.5 rounded-2xl bg-abyss/40 p-4 font-mono text-sm">

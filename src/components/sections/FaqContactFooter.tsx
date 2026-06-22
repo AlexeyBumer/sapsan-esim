@@ -59,7 +59,7 @@ export function Faq() {
 
 export function Contact() {
   return (
-    <section className="relative mx-auto max-w-4xl px-6 py-20">
+    <section id="contact" className="relative mx-auto max-w-4xl px-6 py-20 scroll-mt-24">
       <Reveal className="text-center">
         <h2 className="font-display text-section text-ink">Остались вопросы?</h2>
         <p className="mt-3 font-mono text-sm text-mist/60">Свяжитесь с нами удобным способом.</p>

@@ -21,6 +21,15 @@ export const NAV_LINKS = [
   { label: "Вопросы", href: "/#faq" },
 ] as const;
 
+// Пункты выпадающего меню (значок «≡») в верхнем баре, справа от "Личный кабинет"
+export const MENU_LINKS = [
+  { label: "Контакты", href: "/#contact" },
+  { label: "Тарифы", href: "/#search" },
+  { label: "Реферальная система", href: "/#referral" },
+  { label: "Как активировать", href: "/#how" },
+  { label: "Блог", href: "/blog" },
+] as const;
+
 export const FEATURES = [
   {
     title: "Одна eSIM для всего мира",

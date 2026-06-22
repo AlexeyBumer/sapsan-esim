@@ -6,7 +6,7 @@ import { cn } from "@/lib/cn";
  */
 export default function Logo({ className }: { className?: string }) {
   return (
-    <a href="#top" className={cn("group flex items-center gap-3", className)}>
+    <a href="/#top" className={cn("group flex items-center gap-3", className)}>
       <span className="relative grid place-items-center">
         <svg viewBox="0 0 200 77" className="h-6 w-auto" aria-hidden>
           <defs>

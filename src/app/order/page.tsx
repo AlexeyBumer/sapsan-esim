@@ -2,13 +2,19 @@ import type { Metadata } from "next";
 import Navbar from "@/components/sections/Navbar";
 import { Footer } from "@/components/sections/FaqContactFooter";
 import OrderForm from "@/components/sections/OrderForm";
+import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
   title: "Оформление заказа",
   description: "Купите или пополните eSIM Sapsan. Оплата онлайн, активация после подтверждения.",
 };
 
-export default function OrderPage() {
+export default async function OrderPage() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   return (
     <main className="relative">
       <Navbar />
@@ -22,7 +28,7 @@ export default function OrderPage() {
             Выберите тип заказа и объём трафика. Цена — $1.99 за ГБ.
           </p>
         </div>
-        <OrderForm />
+        <OrderForm isGuest={!user} />
       </section>
       <Footer />
     </main>

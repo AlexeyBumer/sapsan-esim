@@ -20,7 +20,7 @@ export default function LoginPage() {
 
   return (
     <main className="relative min-h-screen">
-      <Navbar />
+      <Navbar variant="auth" />
       <section className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-6 py-32">
         <h1 className="font-display text-section text-ink">Вход</h1>
         <p className="mt-3 font-mono text-sm text-mist/60">
@@ -49,6 +49,12 @@ export default function LoginPage() {
               autoComplete="current-password"
               className="mt-2 w-full rounded-xl border border-white/10 bg-abyss/40 px-4 py-3 font-mono text-sm text-ink outline-none transition-colors focus:border-peach/40 placeholder:text-mist/30"
             />
+            <Link
+              href="/forgot-password"
+              className="mt-2 inline-block font-mono text-xs text-mist/50 underline transition-colors hover:text-peach"
+            >
+              Забыли пароль?
+            </Link>
           </label>
 
           {error && (

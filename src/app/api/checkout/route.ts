@@ -13,6 +13,8 @@ export async function POST(req: Request) {
     const gb = Number(body.gb);
     const email: string | undefined = body.email?.trim() || undefined;
     const esimId: string | undefined = body.esimId?.trim() || undefined;
+    const referralCode: string | undefined =
+      body.referralCode?.trim().toUpperCase() || undefined;
 
     if (!gb || gb < 1 || gb > 500) {
       return NextResponse.json(
@@ -66,6 +68,7 @@ export async function POST(req: Request) {
       package_gb: gb,
       amount_usd: Number(amount),
       payer_email: email ?? user?.email ?? null,
+      referral_code: referralCode ?? null,
       payment_status: "pending",
     });
     if (insertError) {

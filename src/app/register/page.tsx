@@ -1,14 +1,31 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import Navbar from "@/components/sections/Navbar";
 import { signUp } from "@/app/auth/actions";
 
 export default function RegisterPage() {
+  return (
+    <Suspense fallback={null}>
+      <RegisterForm />
+    </Suspense>
+  );
+}
+
+function RegisterForm() {
+  const searchParams = useSearchParams();
   const [error, setError] = useState("");
   const [done, setDone] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [referralCode, setReferralCode] = useState("");
+
+  // Если перешли по реферальной ссылке (?ref=КОД) — подставляем код автоматически.
+  useEffect(() => {
+    const ref = searchParams.get("ref");
+    if (ref) setReferralCode(ref.toUpperCase());
+  }, [searchParams]);
 
   async function action(formData: FormData) {
     setError("");
@@ -21,7 +38,7 @@ export default function RegisterPage() {
 
   return (
     <main className="relative min-h-screen">
-      <Navbar />
+      <Navbar variant="auth" />
       <section className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-6 py-32">
         {done ? (
           <div className="rounded-3xl glass-strong p-8 text-center">
@@ -58,6 +75,19 @@ export default function RegisterPage() {
                 type="password"
                 placeholder="Минимум 8 символов"
               />
+              <label className="block">
+                <span className="font-mono text-xs uppercase tracking-widest text-mist/50">
+                  Пригласительный код <span className="text-mist/30">(необязательно)</span>
+                </span>
+                <input
+                  name="referralCode"
+                  type="text"
+                  placeholder="Например, A1B2C3D4"
+                  value={referralCode}
+                  onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
+                  className="mt-2 w-full rounded-xl border border-white/10 bg-abyss/40 px-4 py-3 font-mono text-sm uppercase text-ink outline-none transition-colors focus:border-peach/40 placeholder:text-mist/30"
+                />
+              </label>
 
               {error && (
                 <p className="rounded-xl border border-red-400/30 bg-red-400/10 px-4 py-3 font-mono text-xs text-red-300">
