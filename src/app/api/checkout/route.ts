@@ -54,20 +54,22 @@ export async function POST(req: Request) {
     const { data: userData } = await supabase.auth.getUser();
     const user = userData?.user ?? null;
 
-    if (user) {
-      const admin = createAdminClient();
-      const { error: insertError } = await admin.from("orders").insert({
-        user_id: user.id,
-        heleket_order_id: orderId,
-        mode,
-        package_gb: gb,
-        amount_usd: Number(amount),
-        payer_email: email ?? user.email ?? null,
-        payment_status: "pending",
-      });
-      if (insertError) {
-        console.error("Заказ не сохранён в БД (продолжаем без привязки):", insertError);
-      }
+    // Заказ всегда сохраняется в БД: для гостя user_id = null,
+    // для залогиненного — его id. Гостевой заказ позже привязывается
+    // к аккаунту автоматически при регистрации с тем же email
+    // (см. src/app/auth/callback/route.ts).
+    const admin = createAdminClient();
+    const { error: insertError } = await admin.from("orders").insert({
+      user_id: user?.id ?? null,
+      heleket_order_id: orderId,
+      mode,
+      package_gb: gb,
+      amount_usd: Number(amount),
+      payer_email: email ?? user?.email ?? null,
+      payment_status: "pending",
+    });
+    if (insertError) {
+      console.error("Заказ не сохранён в БД (продолжаем без записи):", insertError);
     }
 
     const invoice = await createInvoice({

@@ -43,7 +43,7 @@ export default function Navbar() {
         <div className="flex items-center gap-3">
           <a
             href="/account"
-            className="hidden font-mono text-xs text-mist/70 transition-colors hover:text-peach sm:block"
+            className="font-mono text-xs text-mist/70 transition-colors hover:text-peach"
           >
             Кабинет
           </a>
