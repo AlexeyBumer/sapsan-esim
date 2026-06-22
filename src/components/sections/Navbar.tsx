@@ -43,13 +43,22 @@ export default function Navbar() {
         <div className="flex items-center gap-3">
           <a
             href="/account"
-            className="font-mono text-xs text-mist/70 transition-colors hover:text-peach"
+            className="hidden font-mono text-xs text-mist/70 transition-colors hover:text-peach sm:block"
           >
             Кабинет
           </a>
-          <MagneticButton href="/#search" className="!px-5 !py-2.5 text-xs">
-            {BRAND.cta}
-          </MagneticButton>
+          {/* Десктоп: обычная кнопка "Купить eSIM" */}
+          <span className="hidden sm:inline-block">
+            <MagneticButton href="/#search" className="!px-5 !py-2.5 text-xs">
+              {BRAND.cta}
+            </MagneticButton>
+          </span>
+          {/* Мобильный: вместо кнопки "Купить eSIM" — кнопка "Кабинет" */}
+          <span className="sm:hidden">
+            <MagneticButton href="/account" className="!px-5 !py-2.5 text-xs">
+              Кабинет
+            </MagneticButton>
+          </span>
         </div>
       </nav>
     </motion.header>
