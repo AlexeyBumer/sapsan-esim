@@ -78,7 +78,7 @@ export default function Navbar({ variant = "default" }: Props) {
 
               {/* Мобильный: кнопка "Личный кабинет" вместо "Купить eSIM" */}
               <span className="sm:hidden">
-                <MagneticButton href="/account" className="!px-5 !py-2.5 text-xs">
+                <MagneticButton href="/account" className="!px-3.5 !py-2 whitespace-nowrap text-[11px]">
                   Личный кабинет
                 </MagneticButton>
               </span>
