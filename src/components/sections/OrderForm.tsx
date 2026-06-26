@@ -6,9 +6,15 @@ import { DATA_PACKAGES, PRICE_PER_GB, ESIM_SETUP_PRICE, CONTACTS } from "@/lib/c
 
 type Mode = "new" | "topup";
 
-export default function OrderForm({ isGuest = false }: { isGuest?: boolean }) {
+export default function OrderForm({
+  isGuest = false,
+  userEmail,
+}: {
+  isGuest?: boolean;
+  userEmail?: string;
+}) {
   const [mode, setMode] = useState<Mode>("new");
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(userEmail ?? "");
   const [esimId, setEsimId] = useState("");
   const [selectedGb, setSelectedGb] = useState<number>(15);
   const [customMode, setCustomMode] = useState(false);
@@ -39,7 +45,7 @@ export default function OrderForm({ isGuest = false }: { isGuest?: boolean }) {
     return { traffic, setup, sum: traffic + setup };
   }, [gb, mode]);
 
-  const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const emailValid = !!userEmail || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const canSubmit =
     gb >= 1 &&
     gb <= 500 &&
@@ -94,18 +100,27 @@ export default function OrderForm({ isGuest = false }: { isGuest?: boolean }) {
       <div className="mt-5 rounded-3xl glass-strong p-6 sm:p-8">
         {/* Email или ID */}
         {mode === "new" ? (
-          <label className="block">
-            <span className="font-mono text-xs uppercase tracking-widest text-mist/50">
-              Email (на него закрепим eSIM)
-            </span>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@example.com"
-              className="mt-2 w-full rounded-xl border border-white/10 bg-abyss/40 px-4 py-3 font-mono text-sm text-ink outline-none transition-colors focus:border-peach/40 placeholder:text-mist/30"
-            />
-          </label>
+          userEmail ? (
+            <div className="rounded-xl border border-white/10 bg-abyss/40 px-4 py-3">
+              <span className="font-mono text-xs uppercase tracking-widest text-mist/50">
+                eSIM закрепится за аккаунтом
+              </span>
+              <p className="mt-1 font-mono text-sm text-ink">{userEmail}</p>
+            </div>
+          ) : (
+            <label className="block">
+              <span className="font-mono text-xs uppercase tracking-widest text-mist/50">
+                Email (на него закрепим eSIM)
+              </span>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@example.com"
+                className="mt-2 w-full rounded-xl border border-white/10 bg-abyss/40 px-4 py-3 font-mono text-sm text-ink outline-none transition-colors focus:border-peach/40 placeholder:text-mist/30"
+              />
+            </label>
+          )
         ) : (
           <label className="block">
             <span className="font-mono text-xs uppercase tracking-widest text-mist/50">
@@ -184,20 +199,21 @@ export default function OrderForm({ isGuest = false }: { isGuest?: boolean }) {
           )}
         </div>
 
-        {/* Пригласительный код — только для гостей без аккаунта */}
-        {isGuest && (
-          <label className="mt-6 block">
-            <span className="font-mono text-xs uppercase tracking-widest text-mist/50">
-              Пригласительный код <span className="text-mist/30">(необязательно)</span>
-            </span>
-            <input
-              value={referralCode}
-              onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
-              placeholder="Например, A1B2C3D4"
-              className="mt-2 w-full rounded-xl border border-white/10 bg-abyss/40 px-4 py-3 font-mono text-sm uppercase text-ink outline-none transition-colors focus:border-peach/40 placeholder:text-mist/30"
-            />
-          </label>
-        )}
+        {/* Промокод — код друга или акционный промокод. Доступен всем:
+            гостям и авторизованным. Если пользователь уже зарегистрирован
+            по чьей-то ссылке — повторный код друга на сам аккаунт не повлияет,
+            это поле только сохраняет код вместе с заказом. */}
+        <label className="mt-6 block">
+          <span className="font-mono text-xs uppercase tracking-widest text-mist/50">
+            Промокод <span className="text-mist/30">(необязательно)</span>
+          </span>
+          <input
+            value={referralCode}
+            onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
+            placeholder="Код друга или акционный промокод"
+            className="mt-2 w-full rounded-xl border border-white/10 bg-abyss/40 px-4 py-3 font-mono text-sm uppercase text-ink outline-none transition-colors focus:border-peach/40 placeholder:text-mist/30"
+          />
+        </label>
 
         {/* Итог */}
         <div className="mt-6 space-y-1.5 rounded-2xl bg-abyss/40 p-4 font-mono text-sm">

@@ -56,6 +56,14 @@ export async function signUp(formData: FormData) {
           .from("profiles")
           .update({ referred_by: referrer.id })
           .eq("id", data.user.id);
+
+        // Лог: кто кого пригласил и когда — для отображения в /account
+        // и как аудит-след, независимо от того, купит ли друг что-то.
+        await admin.from("referral_log").insert({
+          referrer_id: referrer.id,
+          referred_id: data.user.id,
+          referred_email: email,
+        });
       }
     } catch (e) {
       console.error("Не удалось привязать реферальный код:", e);

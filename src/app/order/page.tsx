@@ -28,7 +28,7 @@ export default async function OrderPage() {
             Выберите тип заказа и объём трафика. Цена — $1.99 за ГБ.
           </p>
         </div>
-        <OrderForm isGuest={!user} />
+        <OrderForm isGuest={!user} userEmail={user?.email ?? undefined} />
       </section>
       <Footer />
     </main>

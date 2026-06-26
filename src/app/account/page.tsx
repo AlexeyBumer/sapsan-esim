@@ -10,6 +10,11 @@ function originUrl() {
   return process.env.NEXT_PUBLIC_SITE_URL || "https://www.sapsansim.com";
 }
 
+function formatDate(iso: string) {
+  const d = new Date(iso);
+  return d.toLocaleDateString("ru-RU", { day: "2-digit", month: "2-digit", year: "numeric" });
+}
+
 export const metadata: Metadata = {
   title: "Личный кабинет",
   robots: { index: false, follow: false },
@@ -31,7 +36,7 @@ export default async function AccountPage() {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("referral_code, balance_usd, email")
+    .select("referral_code, balance_usd, referral_gb_balance, email")
     .eq("id", user.id)
     .single();
 
@@ -39,6 +44,11 @@ export default async function AccountPage() {
     .from("orders")
     .select("id, mode, package_gb, amount_usd, payment_status, esim_id, created_at")
     .order("created_at", { ascending: false });
+
+  const { data: referrals } = await supabase
+    .from("referral_log")
+    .select("id, referred_email, credited, created_at")
+    .order("created_at", { ascending: true });
 
   return (
     <main className="relative">
@@ -59,14 +69,29 @@ export default async function AccountPage() {
           </form>
         </div>
 
-        <div className="mt-10 rounded-3xl glass-strong p-7">
-          <p className="font-mono text-xs uppercase tracking-widest text-mist/50">Баланс</p>
-          <p className="mt-2 font-mono text-4xl font-semibold text-grad">
-            ${Number(profile?.balance_usd ?? 0).toFixed(2)}
-          </p>
-          <p className="mt-2 font-mono text-xs text-mist/50">
-            Пополнение баланса и вывод появятся на следующем этапе.
-          </p>
+        {/* Два отдельных баланса: деньги и ГБ за рефералов */}
+        <div className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2">
+          <div className="rounded-3xl glass-strong p-7">
+            <p className="font-mono text-xs uppercase tracking-widest text-mist/50">Баланс</p>
+            <p className="mt-2 font-mono text-4xl font-semibold text-grad">
+              ${Number(profile?.balance_usd ?? 0).toFixed(2)}
+            </p>
+            <p className="mt-2 font-mono text-xs text-mist/50">
+              Пополнение баланса и вывод появятся на следующем этапе.
+            </p>
+          </div>
+
+          <div className="rounded-3xl glass-strong p-7">
+            <p className="font-mono text-xs uppercase tracking-widest text-mist/50">
+              Бонусный трафик за рефералов
+            </p>
+            <p className="mt-2 font-mono text-4xl font-semibold text-grad">
+              {Number(profile?.referral_gb_balance ?? 0).toFixed(0)} ГБ
+            </p>
+            <p className="mt-2 font-mono text-xs text-mist/50">
+              +5 ГБ за каждого друга после его первой оплаченной покупки.
+            </p>
+          </div>
         </div>
 
         <div className="mt-5 rounded-3xl glass p-7">
@@ -121,9 +146,39 @@ export default async function AccountPage() {
           )}
 
           <p className="mt-3 font-mono text-xs leading-relaxed text-mist/60">
-            Реферальная программа подключается на следующем этапе: за друзей, которые оформят eSIM,
-            будет начисляться вознаграждение на баланс.
+            +5 ГБ на бонусный баланс — как только друг впервые оплатит покупку.
           </p>
+        </div>
+
+        <div className="mt-5 rounded-3xl glass p-7">
+          <p className="font-mono text-xs uppercase tracking-widest text-mist/50">
+            Ваши рефералы {referrals && referrals.length > 0 ? `(${referrals.length})` : ""}
+          </p>
+          {referrals && referrals.length > 0 ? (
+            <div className="mt-4 space-y-2">
+              {referrals.map((r, i) => (
+                <div
+                  key={r.id}
+                  className="flex items-center justify-between rounded-xl bg-white/5 px-4 py-3"
+                >
+                  <span className="font-mono text-sm text-ink">
+                    Реферал {i + 1} — от {formatDate(r.created_at)}
+                  </span>
+                  <span
+                    className={`font-mono text-xs ${
+                      r.credited ? "text-peach" : "text-mist/40"
+                    }`}
+                  >
+                    {r.credited ? "+5 ГБ начислено" : "ожидает первой покупки"}
+                  </span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="mt-3 font-mono text-sm text-mist/70">
+              Пока никто не зарегистрировался по вашей ссылке. Поделитесь ею с друзьями.
+            </p>
+          )}
         </div>
       </section>
       <Footer />

@@ -5,6 +5,10 @@ import { notifyAuthorizedAdmins } from "@/lib/telegram";
 
 export const runtime = "nodejs";
 
+const REFERRAL_REWARD_GB = 5;
+
+type AdminClient = ReturnType<typeof createAdminClient>;
+
 export async function POST(req: Request) {
   const raw = await req.text();
 
@@ -31,7 +35,9 @@ export async function POST(req: Request) {
       .eq("heleket_order_id", orderId)
       .maybeSingle();
 
-    if (existingOrder && existingOrder.payment_status !== "paid") {
+    const wasAlreadyPaid = existingOrder?.payment_status === "paid";
+
+    if (existingOrder && !wasAlreadyPaid) {
       await admin
         .from("orders")
         .update({
@@ -55,6 +61,17 @@ export async function POST(req: Request) {
       } catch {}
     }
 
+    // Реферальный бонус: +5 ГБ рефереру, но только за ПЕРВУЮ оплаченную
+    // покупку приглашённого друга. wasAlreadyPaid защищает от повторного
+    // начисления, если Heleket пришлёт этот же вебхук дважды.
+    if (existingOrder?.user_id && !wasAlreadyPaid) {
+      try {
+        await creditReferralBonusIfEligible(admin, existingOrder.user_id);
+      } catch (e) {
+        console.error("Не удалось начислить реферальный бонус:", e);
+      }
+    }
+
     const amountUsd = data.payment_amount_usd ?? data.amount ?? "—";
 
     await notifyAuthorizedAdmins(
@@ -72,4 +89,47 @@ export async function POST(req: Request) {
   }
 
   return NextResponse.json({ ok: true });
+}
+
+/**
+ * Проверяет, есть ли у пользователя реферер и не была ли уже оплачена
+ * покупка этим пользователем ранее — и если это правда первая оплата,
+ * начисляет +5 ГБ на referral_gb_balance реферера, атомарно через RPC.
+ */
+async function creditReferralBonusIfEligible(admin: AdminClient, userId: string) {
+  const { data: profile } = await admin
+    .from("profiles")
+    .select("id, referred_by")
+    .eq("id", userId)
+    .maybeSingle();
+
+  if (!profile?.referred_by) return;
+
+  const { count: paidCount } = await admin
+    .from("orders")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", userId)
+    .eq("payment_status", "paid");
+
+  // На этот момент текущий заказ уже отмечен paid выше, поэтому при первой
+  // оплате paidCount будет ровно 1.
+  if ((paidCount ?? 0) > 1) return;
+
+  const { data: logRow } = await admin
+    .from("referral_log")
+    .select("id, credited")
+    .eq("referred_id", userId)
+    .maybeSingle();
+
+  if (!logRow || logRow.credited) return;
+
+  await admin
+    .from("referral_log")
+    .update({ credited: true, credited_at: new Date().toISOString() })
+    .eq("id", logRow.id);
+
+  await admin.rpc("increment_referral_gb_balance", {
+    p_user_id: profile.referred_by,
+    p_amount: REFERRAL_REWARD_GB,
+  });
 }
