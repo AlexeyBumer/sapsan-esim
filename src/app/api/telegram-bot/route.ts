@@ -58,7 +58,10 @@ export async function POST(req: Request) {
         locked_until: null,
         updated_at: now.toISOString(),
       });
-      await sendTelegramMessage(chatId, "✅ Вы авторизованы. Уведомления о заказах будут приходить сюда 24 часа.");
+      await sendTelegramMessage(
+        chatId,
+        "✅ Вы авторизованы на 24 часа.\n\nКоманды:\n/issue <order_id> <esim_id> — выдать ID/QR eSIM по заказу"
+      );
     } else {
       const failedAttempts = (session?.failed_attempts ?? 0) + 1;
       const lockNow = failedAttempts >= MAX_ATTEMPTS;
@@ -83,8 +86,73 @@ export async function POST(req: Request) {
   const isAuthorized = session?.authorized_until && new Date(session.authorized_until) > now;
   if (!isAuthorized) {
     await sendTelegramMessage(chatId, "Доступ закрыт. Введите пароль: /login <пароль>");
-  } else {
-    await sendTelegramMessage(chatId, "Вы авторизованы. Уведомления о заказах приходят автоматически.");
+    return NextResponse.json({ ok: true });
   }
+
+  if (text.startsWith("/issue")) {
+    await handleIssueCommand(supabase, chatId, text);
+    return NextResponse.json({ ok: true });
+  }
+
+  await sendTelegramMessage(
+    chatId,
+    "Вы авторизованы. Уведомления о заказах приходят автоматически.\n\nКоманды:\n/issue <order_id> <esim_id> — выдать ID/QR eSIM по заказу"
+  );
   return NextResponse.json({ ok: true });
+}
+
+/**
+ * /issue <order_id> <esim_id>
+ * Вписывает выданный ID/QR eSIM прямо в заказ — без захода в Supabase Table Editor.
+ * order_id — это heleket_order_id заказа (он же был в уведомлении об оплате).
+ */
+async function handleIssueCommand(
+  supabase: ReturnType<typeof createAdminClient>,
+  chatId: number,
+  text: string
+) {
+  const parts = text.split(/\s+/).filter(Boolean);
+  // parts[0] = "/issue", parts[1] = order_id, parts[2] = esim_id
+  const orderId = parts[1];
+  const esimId = parts[2];
+
+  if (!orderId || !esimId) {
+    await sendTelegramMessage(
+      chatId,
+      "Формат команды:\n/issue <order_id> <esim_id>\n\nНапример:\n/issue SAP-1719999999-1234 89701234567890123456"
+    );
+    return;
+  }
+
+  const { data: order } = await supabase
+    .from("orders")
+    .select("id, heleket_order_id, package_gb, mode, payer_email, payment_status, esim_id")
+    .eq("heleket_order_id", orderId)
+    .maybeSingle();
+
+  if (!order) {
+    await sendTelegramMessage(chatId, `❌ Заказ с ID "${orderId}" не найден.`);
+    return;
+  }
+
+  if (order.payment_status !== "paid") {
+    await sendTelegramMessage(
+      chatId,
+      `⚠️ Заказ "${orderId}" пока не отмечен как оплаченный (статус: ${order.payment_status}). Выдать eSIM всё равно?\nЕсли да — повторите команду ещё раз, она применится.`
+    );
+    // Не блокируем жёстко — оператор может видеть оплату напрямую в Heleket
+    // раньше, чем дойдёт вебхук. Продолжаем выдачу.
+  }
+
+  const alreadyIssued = !!order.esim_id;
+
+  await supabase.from("orders").update({ esim_id: esimId }).eq("id", order.id);
+
+  await sendTelegramMessage(
+    chatId,
+    `✅ ${alreadyIssued ? "eSIM ID обновлён" : "eSIM выдан"} по заказу ${orderId}\n` +
+      `Пакет: ${order.package_gb} ГБ (${order.mode === "topup" ? "пополнение" : "новая eSIM"})\n` +
+      `${order.payer_email ? `Email: ${order.payer_email}\n` : ""}` +
+      `eSIM ID: ${esimId}`
+  );
 }
