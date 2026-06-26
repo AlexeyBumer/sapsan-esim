@@ -22,7 +22,23 @@ export async function sendTelegramMessage(chatId: number | string, text: string)
   });
 
   if (!res.ok) {
-    console.error("Telegram sendMessage failed:", res.status, await res.text());
+    const errorText = await res.text();
+    console.error("Telegram sendMessage failed:", res.status, errorText);
+
+    // Защита от тихого молчания бота: если Telegram отбил сообщение из-за
+    // HTML-разметки (например, в тексте случайно оказались символы < >,
+    // которые он принял за недопустимый тег) — переотправляем тот же текст
+    // уже без parse_mode, чтобы оператор всё равно получил уведомление.
+    if (res.status === 400 && errorText.includes("can't parse entities")) {
+      const retry = await fetch(`${TELEGRAM_API(token)}/sendMessage`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ chat_id: chatId, text }),
+      });
+      if (!retry.ok) {
+        console.error("Telegram sendMessage повторная отправка тоже не удалась:", retry.status, await retry.text());
+      }
+    }
   }
 }
 

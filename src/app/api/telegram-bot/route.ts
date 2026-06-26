@@ -60,7 +60,7 @@ export async function POST(req: Request) {
       });
       await sendTelegramMessage(
         chatId,
-        "✅ Вы авторизованы на 24 часа.\n\nКоманды:\n/issue <order_id> <esim_id> — выдать ID/QR eSIM по заказу"
+        "✅ Вы авторизованы на 24 часа.\n\nКоманды:\n/issue ORDER_ID ESIM_ID — выдать ID/QR eSIM по заказу"
       );
     } else {
       const failedAttempts = (session?.failed_attempts ?? 0) + 1;
@@ -85,7 +85,7 @@ export async function POST(req: Request) {
 
   const isAuthorized = session?.authorized_until && new Date(session.authorized_until) > now;
   if (!isAuthorized) {
-    await sendTelegramMessage(chatId, "Доступ закрыт. Введите пароль: /login <пароль>");
+    await sendTelegramMessage(chatId, "Доступ закрыт. Введите пароль: /login ПАРОЛЬ");
     return NextResponse.json({ ok: true });
   }
 
@@ -96,13 +96,13 @@ export async function POST(req: Request) {
 
   await sendTelegramMessage(
     chatId,
-    "Вы авторизованы. Уведомления о заказах приходят автоматически.\n\nКоманды:\n/issue <order_id> <esim_id> — выдать ID/QR eSIM по заказу"
+    "Вы авторизованы. Уведомления о заказах приходят автоматически.\n\nКоманды:\n/issue ORDER_ID ESIM_ID — выдать ID/QR eSIM по заказу"
   );
   return NextResponse.json({ ok: true });
 }
 
 /**
- * /issue <order_id> <esim_id>
+ * /issue ORDER_ID ESIM_ID
  * Вписывает выданный ID/QR eSIM прямо в заказ — без захода в Supabase Table Editor.
  * order_id — это heleket_order_id заказа (он же был в уведомлении об оплате).
  */
@@ -119,7 +119,7 @@ async function handleIssueCommand(
   if (!orderId || !esimId) {
     await sendTelegramMessage(
       chatId,
-      "Формат команды:\n/issue <order_id> <esim_id>\n\nНапример:\n/issue SAP-1719999999-1234 89701234567890123456"
+      "Формат команды:\n/issue ORDER_ID ESIM_ID\n\nНапример:\n/issue SAP-1719999999-1234 89701234567890123456"
     );
     return;
   }
